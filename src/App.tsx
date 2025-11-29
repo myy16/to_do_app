@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CalendarGrid } from './components/CalendarGrid';
+import { Sidebar } from './components/Sidebar';
 import { AddTaskModal } from './components/AddTaskModal';
 import MobileApp from './MobileApp';
 import { apiService, Task } from './services/api';
@@ -17,6 +18,8 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarMode, setSidebarMode] = useState<'notes' | 'ai'>('ai');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   // Centralized task completion state (derived from tasks)
   const [taskCompletions, setTaskCompletions] = useState<TaskCompletionState>({});
@@ -105,6 +108,15 @@ export default function App() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
+  const handleSidebarToggle = (mode: 'notes' | 'ai') => {
+    if (isSidebarOpen && sidebarMode === mode) {
+      setIsSidebarOpen(false);
+    } else {
+      setSidebarMode(mode);
+      setIsSidebarOpen(true);
+    }
+  };
+
   // Show mobile version on small screens
   if (isMobile) {
     return <MobileApp />;
@@ -155,10 +167,12 @@ export default function App() {
         onPreviousMonth={handlePreviousMonth}
         onNextMonth={handleNextMonth}
         onAddTask={() => setIsAddTaskModalOpen(true)}
+        sidebarMode={isSidebarOpen ? sidebarMode : null}
+        onSidebarToggle={handleSidebarToggle}
       />
       
-      <main className="flex max-w-[1440px] mx-auto">
-        <div className="p-8 w-full">
+      <main className="flex max-w-full">
+        <div className="flex-1 p-8">
           <CalendarGrid 
             currentMonth={currentMonth} 
             taskCompletions={taskCompletions}
@@ -167,6 +181,15 @@ export default function App() {
             tasks={tasks}
           />
         </div>
+        
+        {isSidebarOpen && (
+          <div className="w-96 border-l border-gray-200 bg-white hidden lg:block">
+            <Sidebar 
+              mode={sidebarMode} 
+              onClose={() => setIsSidebarOpen(false)} 
+            />
+          </div>
+        )}
       </main>
 
       <AddTaskModal 

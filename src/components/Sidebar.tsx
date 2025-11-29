@@ -16,9 +16,9 @@ interface Message {
 
 export function Sidebar({ mode, onClose }: SidebarProps) {
   return (
-    <div className="h-full flex flex-col bg-blue-50/30">
+    <div className="h-full flex flex-col bg-blue-50/30 overflow-hidden">
       {/* Sidebar Header with Close Button */}
-      <div className="p-4 border-b border-blue-200 bg-white flex items-center justify-between">
+      <div className="p-4 border-b border-blue-200 bg-white flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-1 h-5 bg-blue-600 rounded-full" />
           <h3 className="text-gray-900">
@@ -34,8 +34,10 @@ export function Sidebar({ mode, onClose }: SidebarProps) {
         </button>
       </div>
 
-      {/* Content Area */}
-      {mode === 'notes' ? <NotesContent /> : <AIContent />}
+      {/* Content Area - Scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        {mode === 'notes' ? <NotesContent /> : <AIContent />}
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Search, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Plus, StickyNote, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
@@ -7,9 +7,11 @@ interface HeaderProps {
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   onAddTask: () => void;
+  sidebarMode: 'notes' | 'ai' | null;
+  onSidebarToggle: (mode: 'notes' | 'ai') => void;
 }
 
-export function Header({ currentMonth, onPreviousMonth, onNextMonth, onAddTask }: HeaderProps) {
+export function Header({ currentMonth, onPreviousMonth, onNextMonth, onAddTask, sidebarMode, onSidebarToggle }: HeaderProps) {
   const monthYear = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
@@ -49,6 +51,33 @@ export function Header({ currentMonth, onPreviousMonth, onNextMonth, onAddTask }
               placeholder="Search tasks..."
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-[280px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+
+          {/* Sidebar Toggle Buttons */}
+          <div className="flex items-center gap-2 border border-gray-200 rounded-lg p-1 bg-white">
+            <button
+              onClick={() => onSidebarToggle('notes')}
+              className={`h-9 w-9 rounded-md flex items-center justify-center transition-all ${
+                sidebarMode === 'notes'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+              }`}
+              title="Notes Panel"
+            >
+              <StickyNote className="h-5 w-5" />
+            </button>
+
+            <button
+              onClick={() => onSidebarToggle('ai')}
+              className={`h-9 w-9 rounded-md flex items-center justify-center transition-all ${
+                sidebarMode === 'ai'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+              }`}
+              title="AI Copilot Panel"
+            >
+              <Sparkles className="h-5 w-5" />
+            </button>
           </div>
 
           <Button 
