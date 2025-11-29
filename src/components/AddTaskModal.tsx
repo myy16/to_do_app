@@ -92,7 +92,6 @@ export function AddTaskModal({
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Close dialog"
           >
-            <X size={20} />
           </button>
         </div>
 
