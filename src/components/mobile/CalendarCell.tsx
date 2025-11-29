@@ -1,6 +1,6 @@
 interface CalendarCellProps {
   day?: number;
-  tasks?: Array<{ id: string; priority: 'high' | 'low' }>;
+  tasks?: Array<{ id: string; priority: 'high' | 'low'; completed?: boolean }>;
   isToday?: boolean;
   onClick?: () => void;
 }
@@ -34,7 +34,11 @@ export function CalendarCell({ day, tasks = [], isToday, onClick }: CalendarCell
               <div
                 key={task.id}
                 className={`w-full h-1 rounded-full ${
-                  task.priority === 'high' ? 'bg-red-400' : 'bg-blue-400'
+                  task.completed
+                    ? 'bg-green-400'
+                    : task.priority === 'high'
+                    ? 'bg-red-400'
+                    : 'bg-blue-400'
                 }`}
               />
             ))}

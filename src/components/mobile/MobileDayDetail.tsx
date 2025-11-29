@@ -1,6 +1,5 @@
 import { X, Clock, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
 
 interface Task {
   id: string;
@@ -17,18 +16,11 @@ interface MobileDayDetailProps {
   day: number;
   month: string;
   tasks: Task[];
+  taskCompletions: { [key: string]: boolean };
+  onToggleTask: (taskId: string) => void;
 }
 
-export function MobileDayDetail({ isOpen, onClose, day, month, tasks }: MobileDayDetailProps) {
-  const [taskStates, setTaskStates] = useState<{ [key: string]: boolean }>(
-    tasks.reduce((acc, task) => ({ ...acc, [task.id]: task.completed }), {})
-  );
-
-  const toggleTask = (taskId: string) => {
-    setTaskStates(prev => ({ ...prev, [taskId]: !prev[taskId] }));
-  };
-
-  return (
+export function MobileDayDetail({ isOpen, onClose, day, month, tasks, taskCompletions, onToggleTask }: MobileDayDetailProps) {  return (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -88,7 +80,7 @@ export function MobileDayDetail({ isOpen, onClose, day, month, tasks }: MobileDa
             <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-5">
               <div className="space-y-3 pb-6">
                 {tasks.map((task, index) => {
-                  const isCompleted = taskStates[task.id];
+                  const isCompleted = taskCompletions[task.id];
                   
                   return (
                     <motion.div
@@ -105,7 +97,7 @@ export function MobileDayDetail({ isOpen, onClose, day, month, tasks }: MobileDa
                       <div className="flex items-start gap-3">
                         {/* Checkbox - Critical Styling */}
                         <button
-                          onClick={() => toggleTask(task.id)}
+                          onClick={() => onToggleTask(task.id)}
                           className={`mt-0.5 w-6 h-6 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${
                             isCompleted
                               ? 'bg-[#34A853] border-2 border-[#34A853]'

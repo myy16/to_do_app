@@ -10,9 +10,11 @@ interface MobileHomeProps {
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   onTaskClick: (task: any) => void;
+  taskCompletions: { [key: string]: boolean };
+  onToggleTask: (taskId: string) => void;
 }
 
-export function MobileHome({ currentMonth, onPreviousMonth, onNextMonth, onTaskClick }: MobileHomeProps) {
+export function MobileHome({ currentMonth, onPreviousMonth, onNextMonth, onTaskClick, taskCompletions, onToggleTask }: MobileHomeProps) {
   const monthYear = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long' });
   const today = new Date();
@@ -37,33 +39,33 @@ export function MobileHome({ currentMonth, onPreviousMonth, onNextMonth, onTaskC
     const detailedTasks = [];
     
     if (day === 5) {
-      tasks.push({ id: '1', priority: 'high' as const });
-      tasks.push({ id: '2', priority: 'low' as const });
+      tasks.push({ id: '1', priority: 'high' as const, completed: taskCompletions['1'] ?? false });
+      tasks.push({ id: '2', priority: 'low' as const, completed: taskCompletions['2'] ?? false });
       detailedTasks.push(
-        { id: '1', title: 'Team Meeting', time: '9:00 AM', description: 'Discuss Q4 roadmap and team progress.', priority: 'high' as const, completed: false },
-        { id: '2', title: 'Design Review', time: '2:00 PM', description: 'Review pending pull requests.', priority: 'low' as const, completed: false }
+        { id: '1', title: 'Team Meeting', time: '9:00 AM', description: 'Discuss Q4 roadmap and team progress.', priority: 'high' as const, completed: taskCompletions['1'] ?? false },
+        { id: '2', title: 'Design Review', time: '2:00 PM', description: 'Review pending pull requests.', priority: 'low' as const, completed: taskCompletions['2'] ?? false }
       );
     }
     if (day === 12) {
-      tasks.push({ id: '3', priority: 'high' as const });
+      tasks.push({ id: '3', priority: 'high' as const, completed: taskCompletions['3'] ?? false });
       detailedTasks.push(
-        { id: '3', title: 'Client Call', time: '11:00 AM', description: 'Important call with client to discuss project requirements.', priority: 'high' as const, completed: false }
+        { id: '3', title: 'Client Call', time: '11:00 AM', description: 'Important call with client to discuss project requirements.', priority: 'high' as const, completed: taskCompletions['3'] ?? false }
       );
     }
     if (day === 18) {
-      tasks.push({ id: '4', priority: 'high' as const });
-      tasks.push({ id: '5', priority: 'low' as const });
-      tasks.push({ id: '6', priority: 'low' as const });
+      tasks.push({ id: '4', priority: 'high' as const, completed: taskCompletions['4'] ?? false });
+      tasks.push({ id: '5', priority: 'low' as const, completed: taskCompletions['5'] ?? false });
+      tasks.push({ id: '6', priority: 'low' as const, completed: taskCompletions['6'] ?? false });
       detailedTasks.push(
-        { id: '4', title: 'Sprint Planning', time: '11:00 AM', description: 'Plan upcoming sprint and assign tasks.', priority: 'high' as const, completed: false },
-        { id: '5', title: 'Code Review', time: '3:00 PM', description: 'Review team pull requests.', priority: 'low' as const, completed: false },
-        { id: '6', title: 'Update Docs', time: '4:30 PM', description: 'Update project documentation.', priority: 'low' as const, completed: false }
+        { id: '4', title: 'Sprint Planning', time: '11:00 AM', description: 'Plan upcoming sprint and assign tasks.', priority: 'high' as const, completed: taskCompletions['4'] ?? false },
+        { id: '5', title: 'Code Review', time: '3:00 PM', description: 'Review team pull requests.', priority: 'low' as const, completed: taskCompletions['5'] ?? false },
+        { id: '6', title: 'Update Docs', time: '4:30 PM', description: 'Update project documentation.', priority: 'low' as const, completed: taskCompletions['6'] ?? false }
       );
     }
     if (day === 24) {
-      tasks.push({ id: '7', priority: 'low' as const });
+      tasks.push({ id: '7', priority: 'low' as const, completed: taskCompletions['7'] ?? false });
       detailedTasks.push(
-        { id: '7', title: 'Weekly Sync', time: '1:00 PM', description: 'Weekly team retrospective.', priority: 'low' as const, completed: false }
+        { id: '7', title: 'Weekly Sync', time: '1:00 PM', description: 'Weekly team retrospective.', priority: 'low' as const, completed: taskCompletions['7'] ?? false }
       );
     }
     
@@ -193,6 +195,8 @@ export function MobileHome({ currentMonth, onPreviousMonth, onNextMonth, onTaskC
         day={selectedDay?.day || 0}
         month={monthName}
         tasks={selectedDay?.tasks || []}
+        taskCompletions={taskCompletions}
+        onToggleTask={onToggleTask}
       />
     </div>
   );

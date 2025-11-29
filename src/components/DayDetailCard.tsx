@@ -18,9 +18,10 @@ interface DayDetailCardProps {
   month: string;
   tasks: Task[];
   onToggleTask: (taskId: string) => void;
+  taskCompletions?: { [key: string]: boolean };
 }
 
-export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask }: DayDetailCardProps) {
+export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask, taskCompletions = {} }: DayDetailCardProps) {
 
   return (
     <AnimatePresence>
@@ -80,7 +81,7 @@ export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask
                   <TaskItem
                     key={task.id}
                     task={task}
-                    isCompleted={task.completed}
+                    isCompleted={taskCompletions[task.id] ?? task.completed}
                     onToggle={onToggleTask}
                     index={index}
                   />

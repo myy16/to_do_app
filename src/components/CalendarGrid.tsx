@@ -133,6 +133,7 @@ export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, rece
         month={monthName}
         tasks={selectedDay?.tasks || []}
         onToggleTask={onToggleTask}
+        taskCompletions={taskCompletions}
       />
     </>
   );
