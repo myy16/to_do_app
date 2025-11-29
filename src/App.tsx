@@ -4,6 +4,7 @@ import { CalendarGrid } from './components/CalendarGrid';
 import { Sidebar } from './components/Sidebar';
 import { AddTaskModal } from './components/AddTaskModal';
 import MobileApp from './MobileApp';
+import { apiService, Task } from './services/api';
 
 // Define task completion state type
 interface TaskCompletionState {
@@ -16,36 +17,77 @@ export default function App() {
   const [sidebarMode, setSidebarMode] = useState<'notes' | 'ai'>('ai');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Centralized task completion state
-  const [taskCompletions, setTaskCompletions] = useState<TaskCompletionState>({
-    '1': false, // Team Meeting
-    '2': false, // Review PRs
-    '3': true,  // Design Review - completed
-    '4': false, // Sprint Planning
-    '5': false, // Client Call
-    '6': false, // Update Docs
-    '7': true,  // Code Refactor - completed
-    '8': true,  // Deploy to Prod - completed
-    '9': true,  // QA Testing - completed
-    '10': false, // Weekly Review
-    '11': false, // Project Kickoff
-  });
+  // Centralized task completion state (derived from tasks)
+  const [taskCompletions, setTaskCompletions] = useState<TaskCompletionState>({});
 
   // Track recently completed tasks for sparkle effect
   const [recentlyCompleted, setRecentlyCompleted] = useState<string | null>(null);
 
-  const toggleTaskCompletion = (taskId: string) => {
-    setTaskCompletions(prev => {
-      const newState = !prev[taskId];
+  // Fetch tasks on mount
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedTasks = await apiService.getTasks();
+        setTasks(fetchedTasks);
+        
+        // Initialize task completions from fetched data
+        const completions: TaskCompletionState = {};
+        fetchedTasks.forEach(task => {
+          completions[task.id] = task.completed;
+        });
+        setTaskCompletions(completions);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch tasks:', err);
+        setError('Failed to load tasks. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const toggleTaskCompletion = async (taskId: string) => {
+    try {
+      const currentState = taskCompletions[taskId];
+      const newState = !currentState;
+      
+      // Optimistic update
+      setTaskCompletions(prev => ({
+        ...prev,
+        [taskId]: newState,
+      }));
+
       // If task is being completed (false -> true), trigger sparkle effect
       if (newState) {
         setRecentlyCompleted(taskId);
-        // Remove sparkle after animation
         setTimeout(() => setRecentlyCompleted(null), 1000);
       }
-      return { ...prev, [taskId]: newState };
-    });
+
+      // Call API
+      await apiService.toggleTask(taskId, newState);
+      
+      // Update tasks array
+      setTasks(prev => 
+        prev.map(task => 
+          task.id === taskId ? { ...task, completed: newState } : task
+        )
+      );
+    } catch (err) {
+      console.error('Failed to toggle task:', err);
+      // Revert optimistic update
+      setTaskCompletions(prev => ({
+        ...prev,
+        [taskId]: taskCompletions[taskId],
+      }));
+      setError('Failed to update task. Please try again.');
+    }
   };
 
   useEffect(() => {
@@ -82,8 +124,46 @@ export default function App() {
     return <MobileApp />;
   }
 
+  const handleTaskAdded = async () => {
+    try {
+      const fetchedTasks = await apiService.getTasks();
+      setTasks(fetchedTasks);
+      
+      const completions: TaskCompletionState = {};
+      fetchedTasks.forEach(task => {
+        completions[task.id] = task.completed;
+      });
+      setTaskCompletions(completions);
+    } catch (err) {
+      console.error('Failed to refresh tasks:', err);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin">⏳</div>
+          <p className="mt-4 text-gray-600">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      {error && (
+        <div className="bg-red-50 border-b border-red-200 text-red-700 px-6 py-3">
+          {error}
+          <button 
+            onClick={() => setError(null)}
+            className="ml-4 text-red-700 hover:text-red-900 font-semibold"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       <Header 
         currentMonth={currentMonth}
         onPreviousMonth={handlePreviousMonth}
@@ -103,6 +183,7 @@ export default function App() {
             taskCompletions={taskCompletions}
             onToggleTask={toggleTaskCompletion}
             recentlyCompleted={recentlyCompleted}
+            tasks={tasks}
           />
         </div>
         
@@ -119,6 +200,7 @@ export default function App() {
       <AddTaskModal 
         isOpen={isAddTaskModalOpen}
         onClose={() => setIsAddTaskModalOpen(false)}
+        onTaskAdded={handleTaskAdded}
       />
     </div>
   );

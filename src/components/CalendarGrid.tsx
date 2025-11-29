@@ -1,12 +1,7 @@
 import { StickyNote, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { DayDetailCard } from './DayDetailCard';
-
-interface Task {
-  id: string;
-  title: string;
-  priority: 'high' | 'low' | 'completed';
-}
+import { Task } from '../services/api';
 
 interface DayData {
   date: number;
@@ -21,12 +16,13 @@ interface CalendarGridProps {
   taskCompletions: { [key: string]: boolean };
   onToggleTask: (taskId: string) => void;
   recentlyCompleted: string | null;
+  tasks?: Task[];
 }
 
-export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, recentlyCompleted }: CalendarGridProps) {
-  const days = generateCalendarDays(currentMonth, taskCompletions);
+export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, recentlyCompleted, tasks = [] }: CalendarGridProps) {
+  const days = generateCalendarDays(currentMonth, taskCompletions, tasks);
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const [selectedDay, setSelectedDay] = useState<{ day: number; tasks: any[] } | null>(null);
+  const [selectedDay, setSelectedDay] = useState<{ day: number; tasks: Task[] } | null>(null);
 
   const handleDayClick = (day: DayData) => {
     if (day.isCurrentMonth && day.tasks.length > 0) {
@@ -194,7 +190,7 @@ function getOriginalPriority(taskId: string): 'high' | 'low' {
   return originalPriorities[taskId] || 'low';
 }
 
-function generateCalendarDays(currentMonth: Date, taskCompletions: { [key: string]: boolean }): DayData[] {
+function generateCalendarDays(currentMonth: Date, taskCompletions: { [key: string]: boolean }, apiTasks: Task[] = []): DayData[] {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   
@@ -207,8 +203,20 @@ function generateCalendarDays(currentMonth: Date, taskCompletions: { [key: strin
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Base tasks data with original priorities
-  const baseTasks: { [key: number]: { tasks: { id: string; title: string; basePriority: 'high' | 'low' }[], hasNote: boolean } } = {
+  // Use API tasks if available, otherwise fallback to hardcoded data
+  const tasksByDay: { [key: number]: Task[] } = {};
+  
+  if (apiTasks.length > 0) {
+    // Group API tasks by day
+    apiTasks.forEach(task => {
+      // Extract day from created_at or use default
+      const day = 1; // Default to first day (adjust based on your needs)
+      if (!tasksByDay[day]) {
+        tasksByDay[day] = [];
+      }
+      tasksByDay[day].push(task);
+    });
+  }
     3: {
       tasks: [
         { id: '1', title: 'Team Meeting', basePriority: 'high' },
