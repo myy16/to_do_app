@@ -217,6 +217,9 @@ function generateCalendarDays(currentMonth: Date, taskCompletions: { [key: strin
       tasksByDay[day].push(task);
     });
   }
+
+  // Fallback to hardcoded data
+  const baseTasks: { [key: number]: { tasks: any[]; hasNote: boolean } } = {
     3: {
       tasks: [
         { id: '1', title: 'Team Meeting', basePriority: 'high' },

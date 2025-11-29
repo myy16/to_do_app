@@ -29,7 +29,7 @@ export default function MobileApp() {
   return (
     <div className="h-screen w-screen max-w-[390px] mx-auto bg-white flex flex-col overflow-hidden">
       {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-auto pb-24">
         {currentScreen === 'home' && (
           <MobileHome
             currentMonth={currentMonth}
