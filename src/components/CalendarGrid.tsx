@@ -17,9 +17,10 @@ interface CalendarGridProps {
   onToggleTask: (taskId: string) => void;
   recentlyCompleted: string | null;
   tasks?: Task[];
+  onAddTaskClick?: () => void;
 }
 
-export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, recentlyCompleted, tasks = [] }: CalendarGridProps) {
+export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, recentlyCompleted, tasks = [], onAddTaskClick }: CalendarGridProps) {
   const days = generateCalendarDays(currentMonth, taskCompletions, tasks);
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const [selectedDay, setSelectedDay] = useState<{ day: number; tasks: Task[] } | null>(null);
@@ -134,6 +135,7 @@ export function CalendarGrid({ currentMonth, taskCompletions, onToggleTask, rece
         tasks={selectedDay?.tasks || []}
         onToggleTask={onToggleTask}
         taskCompletions={taskCompletions}
+        onAddTaskClick={onAddTaskClick}
       />
     </>
   );

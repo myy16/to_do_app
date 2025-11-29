@@ -19,9 +19,10 @@ interface DayDetailCardProps {
   tasks: Task[];
   onToggleTask: (taskId: string) => void;
   taskCompletions?: { [key: string]: boolean };
+  onAddTaskClick?: () => void;
 }
 
-export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask, taskCompletions = {} }: DayDetailCardProps) {
+export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask, taskCompletions = {}, onAddTaskClick }: DayDetailCardProps) {
 
   return (
     <AnimatePresence>
@@ -99,7 +100,10 @@ export function DayDetailCard({ isOpen, onClose, day, month, tasks, onToggleTask
 
             {/* Footer */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-              <button className="w-full py-2.5 px-4 bg-[#0055FF] hover:bg-[#0044CC] text-white rounded-lg transition-colors">
+              <button 
+                onClick={onAddTaskClick}
+                className="w-full py-2.5 px-4 bg-[#0055FF] hover:bg-[#0044CC] text-white rounded-lg transition-colors"
+              >
                 Add New Task
               </button>
             </div>

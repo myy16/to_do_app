@@ -179,6 +179,7 @@ export default function App() {
             onToggleTask={toggleTaskCompletion}
             recentlyCompleted={recentlyCompleted}
             tasks={tasks}
+            onAddTaskClick={() => setIsAddTaskModalOpen(true)}
           />
         </div>
         
