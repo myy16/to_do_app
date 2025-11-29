@@ -1,17 +1,10 @@
 import { Clock, Flag } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
-
-interface Task {
-  id: string;
-  title: string;
-  time: string;
-  description: string;
-  priority: 'high' | 'low';
-}
+import { Task } from '../services/api';
 
 interface TaskItemProps {
-  task: Task;
+  task: Omit<Task, 'created_at' | 'updated_at'>;
   isCompleted: boolean;
   onToggle: (taskId: string) => void;
   index: number;

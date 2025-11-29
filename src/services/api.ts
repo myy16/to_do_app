@@ -46,15 +46,10 @@ class ApiService {
   // Create new task
   async createTask(payload: CreateTaskPayload): Promise<Task> {
     try {
-      const formData = new FormData();
-      formData.append('title', payload.title);
-      formData.append('description', payload.description);
-      formData.append('priority', payload.priority);
-      if (payload.time) formData.append('time', payload.time);
-
       const response = await fetch(`${this.baseUrl}/todos/create/`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error('Failed to create task');
@@ -68,16 +63,10 @@ class ApiService {
   // Update task
   async updateTask(id: string, payload: UpdateTaskPayload): Promise<Task> {
     try {
-      const formData = new FormData();
-      if (payload.title) formData.append('title', payload.title);
-      if (payload.description) formData.append('description', payload.description);
-      if (payload.priority) formData.append('priority', payload.priority);
-      if (payload.time) formData.append('time', payload.time);
-      if (payload.completed !== undefined) formData.append('completed', String(payload.completed));
-
       const response = await fetch(`${this.baseUrl}/todos/${id}/update/`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error('Failed to update task');
